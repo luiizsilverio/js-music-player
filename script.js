@@ -5,6 +5,10 @@ const music = document.querySelector('audio');
 const prevBtn = document.getElementById('prev');
 const playBtn = document.getElementById('play');
 const nextBtn = document.getElementById('next');
+const progressContainer = document.getElementById('progress-container');
+const progress = document.getElementById('progress');
+const currentTimeEl = document.getElementById('current-time');
+const durationEl = document.getElementById('duration');
 
 const songs  = [
   {
@@ -72,15 +76,58 @@ function prevSong() {
   playSong();
 }
 
-// Event Listeners
+function getDuration(duration) {
+  const durationMin = Math.floor(duration / 60);
+  let durationSec = Math.floor(duration % 60);
+  
+  // Avoiding NaN
+  if (durationSec) {
+    durationEl.textContent = `${durationMin}:${durationSec.toString().padStart(2,'0')}`;
+  }
+}
+
+function updateProgressBar(e) {
+  if (isPlaying) {
+    const { duration, currentTime } = e.srcElement;
+    const perc = (currentTime / duration) * 100;    
+    
+    progress.style.width = `${perc}%`;
+    
+    getDuration(duration);
+
+    // Calculate current time
+    const currentMin = Math.floor(currentTime / 60);
+    let currentSec = Math.floor(currentTime % 60);
+    
+    // Avoiding NaN
+    if (currentSec) {
+      currentTimeEl.textContent = `${currentMin}:${currentSec.toString().padStart(2,'0')}`;
+    }
+
+  }
+}
+
+function setProgressBar(e) {
+  const width = this.clientWidth;
+  const clickX = e.offsetX;
+  const { duration } = music;
+  music.currentTime = (clickX / width * duration);
+}
+
+// EVENT LISTENERS
 
 playBtn.addEventListener('click', () => (
   isPlaying ? pauseSong() : playSong()
 ));
 
 prevBtn.addEventListener('click', prevSong);
-
 nextBtn.addEventListener('click', nextSong);
 
-// On Load - Select First Song
+music.addEventListener('timeupdate', updateProgressBar);
+music.addEventListener('ended', nextSong);
+
+progressContainer.addEventListener('click', setProgressBar);
+
+// ON LOAD - Select First Song
+
 loadSong(songs[songIndex]);
