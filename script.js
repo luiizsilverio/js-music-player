@@ -103,8 +103,12 @@ function updateProgressBar(e) {
     if (currentSec) {
       currentTimeEl.textContent = `${currentMin}:${currentSec.toString().padStart(2,'0')}`;
     }
-
   }
+}
+
+function initDuration(e) {
+  const { duration } = e.srcElement;
+  getDuration(duration);
 }
 
 function setProgressBar(e) {
@@ -125,6 +129,7 @@ nextBtn.addEventListener('click', nextSong);
 
 music.addEventListener('timeupdate', updateProgressBar);
 music.addEventListener('ended', nextSong);
+music.addEventListener('loadeddata', initDuration);
 
 progressContainer.addEventListener('click', setProgressBar);
 
